@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/BF-Moritz/log.lib.go/src/consts"
+	"github.com/BF-Moritz/log.lib.go/consts"
 )
 
 type Logger struct {
