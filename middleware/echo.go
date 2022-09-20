@@ -10,7 +10,7 @@ func MakeEchoMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(
 		middleware.RequestLoggerConfig{
 			LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-				if v.Error != nil {
+				if v.Error == nil {
 					logger.LogInfo("echo", "%s | %s in %v", v.Method, v.URIPath, v.Latency)
 					return nil
 				}
