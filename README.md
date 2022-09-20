@@ -1,2 +1,2 @@
 # log.lib.go
-a go logging library
+A go logging library by BF_Moritz
