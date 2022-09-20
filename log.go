@@ -6,11 +6,12 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/BF-Moritz/log.lib.go/src/consts"
+	"github.com/BF-Moritz/log.lib.go/consts"
+	"github.com/BF-Moritz/log.lib.go/enum"
 )
 
 type Logger struct {
-	level            uint32
+	level            enum.LogLevel
 	showTime         bool
 	timeFormatString string
 
@@ -22,17 +23,17 @@ type Logger struct {
 }
 
 // NewLogger Creates a new Logger
-func NewLogger(level uint32, showTime, showColor bool) *Logger {
+func NewLogger(level enum.LogLevel, showTime, showColor bool) *Logger {
 	var logger Logger = Logger{
 		level:            level,
 		showTime:         showTime,
-		timeFormatString: consts.TimeFormatString,
+		timeFormatString: consts.DefaultTimeFormatString,
 
-		colorReset: consts.Reset,
-		colorDebug: consts.Cyan,
-		colorInfo:  consts.Green,
-		colorError: consts.Red,
-		colorFatal: consts.Purple,
+		colorReset: consts.ColorReset,
+		colorDebug: consts.ColorCyan,
+		colorInfo:  consts.ColorGreen,
+		colorError: consts.ColorRed,
+		colorFatal: consts.ColorPurple,
 	}
 
 	if runtime.GOOS == "windows" || !showColor {
