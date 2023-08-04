@@ -14,7 +14,7 @@ func MakeEchoMiddleware(logger *logger.Logger) echo.MiddlewareFunc {
 					logger.LogInfo("echo", "%s | %s in %v", v.Method, v.URIPath, v.Latency)
 					return nil
 				}
-				logger.LogError("echo", "%s | %s in %s (%s)", v.Method, v.URI, v.Latency, v.Error)
+				logger.LogError("echo", "%s | %s in %s (%s)", v.Method, v.URIPath, v.Latency, v.Error)
 				return v.Error
 			},
 			LogError:   true,
