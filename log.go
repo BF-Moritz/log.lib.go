@@ -2,9 +2,8 @@ package loglibgo
 
 import (
 	"fmt"
-	"log"
+	"os"
 	"runtime"
-	"time"
 
 	"github.com/BF-Moritz/log.lib.go/consts"
 	"github.com/BF-Moritz/log.lib.go/enum"
@@ -15,6 +14,8 @@ type Logger struct {
 	showTime         bool
 	timeFormatString string
 
+	file *os.File
+
 	colorReset string
 	colorDebug string
 	colorInfo  string
@@ -23,11 +24,13 @@ type Logger struct {
 }
 
 // NewLogger Creates a new Logger
-func NewLogger(level enum.LogLevel, showTime, showColor bool) *Logger {
+func NewLogger(level enum.LogLevel, showTime, showColor bool, file *os.File) *Logger {
 	var logger Logger = Logger{
 		level:            level,
 		showTime:         showTime,
 		timeFormatString: consts.DefaultTimeFormatString,
+
+		file: file,
 
 		colorReset: consts.ColorReset,
 		colorDebug: consts.ColorCyan,
@@ -52,45 +55,60 @@ func (l *Logger) SetTimeFormatString(formatString string) {
 	l.timeFormatString = formatString
 }
 
-func (l *Logger) LogDebug(function, message string, args ...interface{}) {
+// LogDebug logs a debug message
+func (l *Logger) LogDebug(message string, args ...interface{}) {
 	if l.level < 3 {
 		return
 	}
 
-	timeString := ""
-	if l.showTime {
-		timeString = fmt.Sprintf("[%s]: ", time.Now().Format(l.timeFormatString))
-	}
-	fmt.Printf("%s%s[DBG] %s: %s%s\n", l.colorDebug, timeString, function, fmt.Sprintf(message, args...), l.colorReset)
+	funcName := l.getFunctionName()
+
+	outStr, nonColorString := l.formatString(l.colorDebug, "DBG", funcName, fmt.Sprintf(message, args...))
+
+	_, _ = fmt.Print(outStr)
+
+	_ = l.logToFile(nonColorString)
 }
 
-func (l *Logger) LogInfo(function, message string, args ...interface{}) {
+// LogInfo logs an info message
+func (l *Logger) LogInfo(message string, args ...interface{}) {
 	if l.level < 2 {
 		return
 	}
 
-	timeString := ""
-	if l.showTime {
-		timeString = fmt.Sprintf("[%s]: ", time.Now().Format(l.timeFormatString))
-	}
-	fmt.Printf("%s%s[NFO] %s: %s%s\n", l.colorInfo, timeString, function, fmt.Sprintf(message, args...), l.colorReset)
+	funcName := l.getFunctionName()
+
+	outStr, nonColorString := l.formatString(l.colorInfo, "NFO", funcName, fmt.Sprintf(message, args...))
+
+	_, _ = fmt.Print(outStr)
+
+	_ = l.logToFile(nonColorString)
 }
 
-func (l *Logger) LogError(function, message string, args ...interface{}) {
+// LogError logs an error message
+func (l *Logger) LogError(message string, args ...interface{}) {
 	if l.level < 1 {
 		return
 	}
-	timeString := ""
-	if l.showTime {
-		timeString = fmt.Sprintf("[%s]: ", time.Now().Format(l.timeFormatString))
-	}
-	fmt.Printf("%s%s[ERR] %s: %s%s\n", l.colorError, timeString, function, fmt.Sprintf(message, args...), l.colorReset)
+
+	funcName := l.getFunctionName()
+
+	outStr, nonColorString := l.formatString(l.colorError, "ERR", funcName, fmt.Sprintf(message, args...))
+
+	_, _ = fmt.Print(outStr)
+
+	_ = l.logToFile(nonColorString)
 }
 
-func (l *Logger) LogFatal(function, message string, args ...interface{}) {
-	timeString := ""
-	if l.showTime {
-		timeString = fmt.Sprintf("[%s]: ", time.Now().Format(l.timeFormatString))
-	}
-	log.Fatalf("%s%s[FAT] %s: %s%s\n", l.colorFatal, timeString, function, fmt.Sprintf(message, args...), l.colorReset)
+// LogFatal logs a fatal message
+func (l *Logger) LogFatal(message string, args ...interface{}) {
+	funcName := l.getFunctionName()
+
+	outStr, nonColorString := l.formatString(l.colorFatal, "FAT", funcName, fmt.Sprintf(message, args...))
+
+	_, _ = fmt.Print(outStr)
+
+	_ = l.logToFile(nonColorString)
+
+	os.Exit(1)
 }
